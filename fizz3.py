@@ -43,30 +43,26 @@ def try_answer(question_url, answer):
 def fizzbuzz(numbers, rules):
     answer = []
     for num in numbers:
-        if num == 0:
-            answer.append("0")
-            continue
+        # if num == 0:
+        #     answer.append("0")
+        #     continue
 
-        flag = False
         temp = ""
         for rule in rules:
             fact, resp = rule['number'], rule['response']
             if num % fact == 0:
                 temp += resp
-                flag = True
         if temp:
             answer.append(temp)
-
-        if not flag and not temp:
+        else:
             answer.append(str(num))
+
     return " ".join(answer)
 
 # keep trying answers until a correct one is given
 def get_correct_answer(question_url, rules, nums):
     while True:
-        # answer = input('Enter your answer:\n')
-        #
-        # response = try_answer(question_url, answer)
+
 
         if question_url.split('/')[-1] == "1":
             answer = 'COBOL'
@@ -81,8 +77,7 @@ def get_correct_answer(question_url, rules, nums):
             print('congratulations!')
             exit()
 
-        if (response.get('result') == 'correct'):
-            input('press enter to continue')
+        elif (response.get('result') == 'correct'):
             return response.get('nextQuestion')
 
 # do the next question
