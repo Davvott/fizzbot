@@ -3,6 +3,7 @@
 import json
 import urllib.request
 import urllib.error
+import requests
 
 domain = 'https://api.noopschallenge.com'
 
@@ -23,11 +24,13 @@ def print_response(dict):
 def try_answer(question_url, answer):
     print_sep()
     body = json.dumps({ 'answer': answer })
+
     print('*** POST %s %s' % (question_url, body))
     try:
-        req = urllib.request.Request(domain + question_url, data=body.encode('utf8'), headers={'Content-Type': 'application/json'})
-        res = urllib.request.urlopen(req)
-        response = json.load(res)
+        req = requests.post(domain + question_url, json=({'answer': answer}))
+        # req = urllib.request.Request(domain + question_url, data=body.encode('utf8'), headers={'Content-Type': 'application/json'})
+        # res = urllib.request.urlopen(req)
+        response = req.json()
         print_response(response)
         print_sep()
         return response
@@ -37,12 +40,42 @@ def try_answer(question_url, answer):
         print_response(response)
         return response
 
-# keep trying answers until a correct one is given
-def get_correct_answer(question_url):
-    while True:
-        answer = input('Enter your answer:\n')
+def fizzbuzz(numbers, rules):
+    answer = []
+    for num in numbers:
+        if num == 0:
+            answer.append("0")
+            continue
 
-        response = try_answer(question_url, answer)
+        flag = False
+        temp = ""
+        for rule in rules:
+            fact, resp = rule['number'], rule['response']
+            if num % fact == 0:
+                temp += resp
+                flag = True
+        if temp:
+            answer.append(temp)
+
+        if not flag and not temp:
+            answer.append(str(num))
+    return " ".join(answer)
+
+# keep trying answers until a correct one is given
+def get_correct_answer(question_url, rules, nums):
+    while True:
+        # answer = input('Enter your answer:\n')
+        #
+        # response = try_answer(question_url, answer)
+
+        if question_url.split('/')[-1] == "1":
+            answer = 'COBOL'
+            response = try_answer(question_url, answer)
+        else:
+            # do FizzBuzz code
+            answer = fizzbuzz(nums, rules)
+            print(answer)
+            response = try_answer(question_url, answer)
 
         if (response.get('result') == 'interview complete'):
             print('congratulations!')
@@ -64,8 +97,13 @@ def do_question(domain, question_url):
 
     next_question = question_data.get('nextQuestion')
 
-    if next_question: return next_question
-    return get_correct_answer(question_url)
+    rules = question_data.get('rules')
+    nums = question_data.get('numbers')
+    print(rules, nums)
+    if next_question:
+        return next_question
+
+    return get_correct_answer(question_url, rules, nums)
 
 
 def main():
