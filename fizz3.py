@@ -63,7 +63,6 @@ def fizzbuzz(numbers, rules):
 def get_correct_answer(question_url, rules, nums):
     while True:
 
-
         if question_url.split('/')[-1] == "1":
             answer = 'COBOL'
             response = try_answer(question_url, answer)
